@@ -5,6 +5,7 @@ import (
 
 	app "github.com/DevYukine/swords_to_poll_shares/internal"
 	"github.com/DevYukine/swords_to_poll_shares/internal/discord"
+	"github.com/DevYukine/swords_to_poll_shares/internal/discord/commands"
 	"github.com/DevYukine/swords_to_poll_shares/internal/discord/handler"
 
 	"github.com/bwmarrin/discordgo"
@@ -30,6 +31,8 @@ func main() {
 			AsHandler(handler.NewReadyHandler),
 			AsHandler(handler.NewMessagePollVoteAddHandler),
 			AsHandler(handler.NewMessagePollVoteRemoveHandler),
+			AsHandler(handler.NewInteractionCreateHandler),
+			AsCommand(commands.NewPingCommand),
 		),
 		fx.Invoke(func(session *discordgo.Session, params struct {
 			fx.In
@@ -39,7 +42,10 @@ func main() {
 				session.AddHandler(h.GetHandlerFunc())
 			}
 		}),
-		fx.Invoke(func(lc fx.Lifecycle, cfg *app.Config, logger *zap.Logger, discordSession *discordgo.Session) {
+		fx.Invoke(func(lc fx.Lifecycle, cfg *app.Config, logger *zap.Logger, discordSession *discordgo.Session, params struct {
+			fx.In
+			Commands []commands.Command `group:"commands"`
+		}) {
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					logger.Info("Connecting to discord websocket")
@@ -50,6 +56,12 @@ func main() {
 					}
 
 					logger.Info("Connected to discord websocket")
+
+					err = commands.RegisterCommands(discordSession, logger, params.Commands)
+					if err != nil {
+						logger.Error("Failed to register commands", zap.Error(err))
+						return err
+					}
 
 					return nil
 				},
@@ -76,5 +88,13 @@ func AsHandler(f any) any {
 		f,
 		fx.As(new(handler.Handler)),
 		fx.ResultTags(`group:"handlers"`),
+	)
+}
+
+func AsCommand(f any) any {
+	return fx.Annotate(
+		f,
+		fx.As(new(commands.Command)),
+		fx.ResultTags(`group:"commands"`),
 	)
 }

@@ -27,13 +27,15 @@ func (h *ReadyHandler) Handle(s *discordgo.Session, r *discordgo.Ready) {
 		}
 	}
 
-	_, err := s.ChannelMessageSendComplex("1461914574663061574", &discordgo.MessageSend{
+	msg, err := s.ChannelMessageSendComplex("1461914574663061574", &discordgo.MessageSend{
 		Poll: app.CreateWeeklyCommanderPoll(),
 	})
 
 	if err != nil {
 		h.logger.Error("Failed to send weekly poll message", zap.Error(err))
 	}
+
+	h.logger.Info("Weekly poll message sent", zap.String("message_id", msg.ID))
 }
 
 func (h *ReadyHandler) GetHandlerFunc() interface{} {
