@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	app "swords_to_poll_shares/internal"
 	"swords_to_poll_shares/internal/discord"
 	"swords_to_poll_shares/internal/discord/handler"
@@ -31,32 +30,10 @@ func main() {
 			AsHandler(handler.NewMessagePollVoteAddHandler),
 			AsHandler(handler.NewMessagePollVoteRemoveHandler),
 		),
-		fx.Invoke(func(session *discordgo.Session, logger *zap.Logger, params struct {
+		fx.Invoke(func(session *discordgo.Session, params struct {
 			fx.In
 			Handlers []handler.Handler `group:"handlers"`
 		}) {
-			discordgo.Logger = func(level, caller int, format string, args ...interface{}) {
-				msg := fmt.Sprintf(format, args...)
-				log := logger.WithOptions(
-					zap.AddCallerSkip(caller),
-					zap.AddStacktrace(zap.ErrorLevel),
-				)
-
-				switch level {
-				case discordgo.LogDebug:
-					log.Debug(msg)
-				case discordgo.LogInformational:
-					// discordgo informational contains debug logs so we map it to debug
-					log.Debug(msg)
-				case discordgo.LogWarning:
-					log.Warn(msg)
-				case discordgo.LogError:
-					log.Error(msg)
-				default:
-					log.Error("Unknown log level", zap.Int("level", level), zap.String("message", msg))
-				}
-			}
-
 			for _, h := range params.Handlers {
 				session.AddHandler(h.GetHandlerFunc())
 			}
