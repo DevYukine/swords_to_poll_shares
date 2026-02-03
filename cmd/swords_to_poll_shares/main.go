@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	app "swords_to_poll_shares/internal"
-	"swords_to_poll_shares/internal/discord"
-	"swords_to_poll_shares/internal/discord/handler"
+
+	app "github.com/DevYukine/swords_to_poll_shares/internal"
+	"github.com/DevYukine/swords_to_poll_shares/internal/discord"
+	"github.com/DevYukine/swords_to_poll_shares/internal/discord/handler"
 
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/fx"

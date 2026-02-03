@@ -1,4 +1,4 @@
-module swords_to_poll_shares
+module github.com/DevYukine/swords_to_poll_shares
 
 go 1.25
 

@@ -16,13 +16,6 @@ ENV CGO_ENABLED=0 \
 
 WORKDIR /src
 
-RUN apt-get update && apt-get install -y --no-install-recommends openssh-client \
-  && rm -rf /var/lib/apt/lists/* \
-  && mkdir -p /root/.ssh && chmod 700 /root/.ssh \
-  && ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> /root/.ssh/known_hosts
-
-RUN git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
-
 # 1) Prime the module cache (separate from source for better caching)
 COPY go.mod go.sum ./
 

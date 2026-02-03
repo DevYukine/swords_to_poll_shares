@@ -2,7 +2,8 @@ package discord
 
 import (
 	"fmt"
-	app "swords_to_poll_shares/internal"
+
+	app "github.com/DevYukine/swords_to_poll_shares/internal"
 
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
